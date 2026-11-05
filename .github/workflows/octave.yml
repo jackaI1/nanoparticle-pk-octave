@@ -1,0 +1,33 @@
+name: Octave validation
+on:
+  push:
+    branches: [main, 'skills/**']
+  pull_request:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  test-and-regenerate:
+    runs-on: ubuntu-latest
+    container: ubuntu:24.04
+    timeout-minutes: 15
+    env:
+      GNUTERM: pngcairo
+    steps:
+      - name: Install Octave and headless plotting
+        run: |
+          apt-get update -qq
+          DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends octave gnuplot-nox ghostscript fonts-freefont-otf ca-certificates git
+      - uses: actions/checkout@v4
+      - name: Run unit tests
+        run: octave --no-gui --quiet scripts/run_tests.m
+      - name: Regenerate all figures and results
+        run: octave --no-gui --quiet scripts/regenerate_all.m
+      - name: Check regenerated scientific outputs
+        run: octave --no-gui --quiet scripts/check_results.m
+      - uses: actions/upload-artifact@v4
+        with:
+          name: regenerated-pk-results
+          path: |
+            figures/*.png
+            results/*.csv
