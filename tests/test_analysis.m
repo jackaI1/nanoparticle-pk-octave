@@ -55,3 +55,13 @@
 %!error <step> pk_sensitivity(pk_parameters(1),[0;1],{'CL'},1)
 %!error <CV> pk_monte_carlo(pk_parameters(1),[0;1],{'CL'},-0.1,10,1)
 %!error <integer> pk_monte_carlo(pk_parameters(1),[0;1],{'CL'},0.1,1.5,1)
+
+%!test
+%! p=pk_parameters(1); p.infusion=1.5; t=[2;10;24;48];
+%! observed=pk_simulate(p,t).concentration .* [1;1.1;0.9;1.05];
+%! f=pk_fit(t,observed,p,{'CL'});
+%! rows=pk_fit_residuals(t,observed,f);
+%! assert(rows(:,1),t); assert(rows(:,2),observed);
+%! assert(rows(:,3),f.predicted,1e-12);
+%! assert(rows(:,4),f.predicted-observed,1e-12);
+%! assert(rows(:,5),100*(f.predicted-observed)./observed,1e-10);

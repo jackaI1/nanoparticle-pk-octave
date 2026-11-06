@@ -13,6 +13,8 @@ I wrote the library in **MATLAB-language code and run it in GNU Octave**. No Mat
 
 ![Model fits and residuals against digitized public concentrations](figures/fits.png)
 
+The table [results/fit_residuals.csv](results/fit_residuals.csv) lists each measured concentration, prediction and error for all three fits. A positive error means the model predicts above the measurement. These are errors on the same points used for fitting, not an independent prediction test.
+
 The dots are six approximate group means I read from [Li et al. (2022), Figure 3A](https://doi.org/10.3389/fonc.2022.1070001). They are published measurements read from a picture, not invented observations or individual patient records. The two- and three-pool curves fit clearance and central volume while holding exchange at assumed values. Those assumptions appear on the figures and in the [data notes](data/README.md).
 
 ## Running it on my own data
@@ -73,6 +75,6 @@ This project is for learning and research exploration. It cannot select a treatm
 
 ## Library and reproducible outputs
 
-Each function in `src/` has a help comment with its inputs, outputs and units. `scripts/regenerate_all.m` rebuilds all four figures and six CSV files in `results/`, including fitted parameters, concentration curves, sensitivity, every Monte Carlo draw, percentile curves and mass balance. Nothing downloads during a run.
+Each function in `src/` has a help comment with its inputs, outputs and units. `scripts/regenerate_all.m` rebuilds all four figures and seven CSV files in `results/`, including fitted parameters, concentration curves, sensitivity, every Monte Carlo draw, percentile curves and mass balance. Nothing downloads during a run.
 
-I use Octave test blocks instead of `matlab.unittest`, which is not available in this runtime. The 29 tests check analytic bolus and infusion solutions, independent matrix-exponential solutions for two and three compartments, mass conservation, parameter recovery, public-data fitting, sensitivity, repeatability and invalid inputs. GitHub Actions runs the tests, regenerates the figures and checks the scientific outputs inside an Ubuntu 24.04 container. The same container setup is available in the Dockerfile. CI uploads regenerated figures and tables for inspection.
+I use Octave test blocks instead of `matlab.unittest`, which is not available in this runtime. The 30 tests check analytic bolus and infusion solutions, independent matrix-exponential solutions for two and three compartments, mass conservation, parameter recovery, public-data fitting, sensitivity, repeatability and invalid inputs. GitHub Actions runs the tests, regenerates the figures and checks the scientific outputs inside an Ubuntu 24.04 container. The same container setup is available in the Dockerfile. CI uploads regenerated figures and tables for inspection.
