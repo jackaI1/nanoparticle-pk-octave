@@ -21,6 +21,13 @@ function pk_regenerate(root)
   end
   save_csv(fullfile(results,'fits.csv'), ...
     'compartments,CL_L_h_m2,V1_L_m2,log_sse,rmse_ug_ml,exitflag',metrics);
+  residual_rows=[];
+  for n=1:3
+    rows=pk_fit_residuals(d.time,d.concentration,fits{n});
+    residual_rows=[residual_rows; n*ones(numel(d.time),1) rows];
+  end
+  save_csv(fullfile(results,'fit_residuals.csv'), ...
+    'compartments,time_h,observed_ug_ml,predicted_ug_ml,error_ug_ml,error_percent',residual_rows);
   save_csv(fullfile(results,'curves.csv'),'time_h,one_ug_ml,two_ug_ml,three_ug_ml',[t curves]);
 
   h=new_figure(); guard=onCleanup(@() close(h));
@@ -79,7 +86,7 @@ function pk_regenerate(root)
   for k=1:numel(expected)
     info=dir(fullfile(out,expected{k})); assert(~isempty(info) && info.bytes>5000);
   end
-  fprintf('Generated 4 figures and 6 CSV files; 200 Monte Carlo draws.\n');
+  fprintf('Generated 4 figures and 7 CSV files; 200 Monte Carlo draws.\n');
   fprintf('1-compartment fit: CL=%.6f L/h/m2, V1=%.6f L/m2, RMSE=%.4f ug/mL\n', ...
           metrics(1,2),metrics(1,3),metrics(1,5));
 end
