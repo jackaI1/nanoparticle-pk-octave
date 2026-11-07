@@ -6,4 +6,4 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-ins
 WORKDIR /work
 COPY . .
 ENV GNUTERM=pngcairo
-CMD ["sh", "-c", "octave --no-gui --quiet scripts/run_tests.m && octave --no-gui --quiet scripts/regenerate_all.m"]
+CMD ["sh", "-c", "octave --no-gui --quiet scripts/run_tests.m && octave --no-gui --quiet scripts/check_worked_example.m && octave --no-gui --quiet scripts/regenerate_all.m && octave --no-gui --quiet scripts/check_results.m"]
