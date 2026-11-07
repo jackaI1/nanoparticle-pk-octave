@@ -1,6 +1,8 @@
 # Nanoparticle drug circulation
 
-I built a nanoparticle drug circulation simulator because I wanted to understand how liposomal drug concentrations change over time. It divides the body into connected pools and compares their predicted concentrations with measurements read from a published graph. I can run the example below or change the dose and pool settings for my own exploration.
+I built a simulator of drug levels in the blood because I wanted to learn how to turn measurements into a model of how long a drug stays in circulation. The example follows a cancer drug carried inside tiny fat-based shells, which change how the drug travels through the body. These shells are called liposomes, a type of nanoparticle, or very small particle. I wanted to understand what a few published measurements could tell me about the drug still inside those carriers over time.
+
+I represent circulation as connected, well-mixed pools, fit their settings to a published graph, and plot where the model agrees or disagrees with the measurements. I can run the example below or change the dose and pool settings for my own exploration. This is my learning project, not a way to choose anyone's treatment. The maintained code and merged changes are in [this repository](https://github.com/jackaI1/nanoparticle-pk-octave).
 
 ## Try the example
 
@@ -10,6 +12,7 @@ Install GNU Octave and a plotting backend. On Ubuntu:
 sudo apt-get update
 sudo apt-get install octave gnuplot-nox ghostscript fonts-freefont-otf
 octave --no-gui --quiet scripts/run_tests.m
+octave --no-gui --quiet scripts/check_worked_example.m
 octave --no-gui --quiet scripts/regenerate_all.m
 octave --no-gui --quiet scripts/check_results.m
 ```
@@ -46,4 +49,13 @@ rows = pk_fit_residuals([2 24 48 96], [24 18 14 8], f)
 
 ## Implementation and checks
 
-The MATLAB-language functions in `src/` use `ode45` to integrate the compartment equations and `fminsearch` to fit parameters. The regeneration script also calculates sensitivity, mass balance and simulated variability. The Octave tests cover analytical solutions, mass balance, parameter recovery and diagnostics; CI runs the suite, regenerates the outputs and checks the exported tables and figures.
+The MATLAB-language functions in `src/` use `ode45` to integrate the compartment equations and `fminsearch` to fit parameters. The regeneration script also calculates sensitivity, mass balance and simulated variability. The 33 Octave tests cover analytical solutions, mass balance, parameter recovery, diagnostics and rejection of altered exports; CI runs the suite and worked checks, regenerates the outputs and checks the exported tables and figures.
+
+`scripts/check_worked_example.m` prints two numerical checks so I can see what passed:
+
+| Check | Inputs | Expected | Obtained (rounded) | Pass tolerance |
+| --- | --- | --- | --- | --- |
+| Known one-pool decay at 4 h | Immediate 10 mg dose, 2 L pool, 0.4 L/h clearance | 2.24664482 mg/L from `5*exp(-0.2*4)` | 2.24664482 mg/L | Absolute difference ≤ 0.000002 mg/L |
+| Refit published first measurement at 25.5 h | 50 mg/m² over 1.5 h; fit all six group means | Stored reference 26.5695 µg/mL | 26.5695 µg/mL versus observed 26.2 µg/mL; error +0.3695 µg/mL | Within 0.005 µg/mL of reference |
+
+The first check compares the numerical solver with an exact equation. The second catches changes to the worked fit; its tolerance is for software repeatability, not measurement accuracy. The root-mean-square error, a typical concentration difference across all six points, is 0.24535 µg/mL (checked within 0.005 µg/mL of that reference). The export checks also recompute each model from its saved parameters and compare all 18 prediction rows within 0.000001 µg/mL.

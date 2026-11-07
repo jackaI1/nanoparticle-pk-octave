@@ -93,7 +93,14 @@ end
 
 function h = new_figure()
   h=figure('visible','off','position',[100 100 1000 760],'color','w');
-  set(h,'defaultaxesfontsize',12,'defaulttextfontsize',12);
+  % Some Octave versions select a different backend for a new figure even
+  % after the global selection. Bind this hidden figure before plotting.
+  try
+    graphics_toolkit(h,'gnuplot');
+    set(h,'defaultaxesfontsize',12,'defaulttextfontsize',12);
+  catch err
+    close(h); rethrow(err);
+  end
 end
 
 function save_csv(path,header,values)
